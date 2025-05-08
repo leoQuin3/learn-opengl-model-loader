@@ -21,6 +21,7 @@ x64/
 *.ipch
 *.tlog
 CMakeCache.txt
+CMakeSettings.json
 
 # User-specific files
 *.rsuser
