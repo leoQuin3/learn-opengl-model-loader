@@ -17,11 +17,15 @@ struct Texture {
 class Mesh
 {
 public:
+	// Properties
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector <Texture> textures;
 	
+	// Constructor
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+
+	// Methods
 	void draw(Shader& shader);
 
 private:
