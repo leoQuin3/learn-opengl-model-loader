@@ -3,6 +3,25 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Generated files
+.vs/
+out/
+out/build/
+CMakeFiles/
+x64/
+*.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.obj
+*.pdb
+*.exe
+*.log
+*.sdf
+*.ipch
+*.tlog
+CMakeCache.txt
+
 # User-specific files
 *.rsuser
 *.suo

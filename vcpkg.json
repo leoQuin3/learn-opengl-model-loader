@@ -1,0 +1,10 @@
+{
+    "name": "model-loader",
+    "version-string": "0.0.0",
+    "dependencies": [
+        "glad",
+        "glfw3",
+        "assimp",
+        "glm"
+    ]
+}
