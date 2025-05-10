@@ -25,9 +25,12 @@ bool firstMouse = true;
 float lastX = SCREEN_WIDTH / 2.f;
 float lastY = SCREEN_HEIGHT / 2.f;
 
+int main();
+
 // Callback functions
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void cursorCallback(GLFWwindow* window, double xPos, double yPos);
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
 
 // TODO:
@@ -59,6 +62,7 @@ int main()
 	// Register callback functions
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetCursorPosCallback(window, cursorCallback);
+	glfwSetScrollCallback(window, scrollCallback);
 
 	// Load functions using glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -185,6 +189,11 @@ void cursorCallback(GLFWwindow* window, double xPosIn, double yPosIn)
 	lastY = ypos;
 
 	camera.processMouseMovement(xOffset, yOffset, true);
+}
+
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+	camera.fov += yOffset * 2.0;
 }
 
 #endif
