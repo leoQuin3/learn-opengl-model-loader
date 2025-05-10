@@ -1,8 +1,17 @@
 add_executable(model_loader_main
 	main.cpp
 	"shader.cpp"
+	"mesh.cpp"
+	"model.cpp"
+	"stb_image.cpp"
+	"camera.cpp"
+	"mesh.h"
+	"model.h"
 	"stb_image.h"
- "Mesh.h" "Mesh.cpp")
+	"camera.h"
+)
+
+add_compile_definitions(PROJECT_ROOT_DIR="${CMAKE_SOURCE_DIR}")
 
 find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
