@@ -34,8 +34,8 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
 
 // TODO:
-//	- Left off at 'Advanced OpenGL > Depth Testing'
 //	- Edit fragment shader to allow multiple number of texture maps (diffuse and specular)
+//	- Move onto 'Advanced OpenGL' > 'Depth Testing'
 
 int main()
 {
@@ -101,20 +101,24 @@ int main()
 		glm::mat4 projectionMtrx = glm::perspective(glm::radians(camera.fov), static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT, .1f, 100.f);
 		shader.setMat4("projection", projectionMtrx);
 		shader.setMat4("view", viewMtrx);
+		shader.setVec3("viewPos", camera.position);
 
 		// Model transformations
-		glm::mat4 modelMtrx = glm::mat4(1.f);
-		modelMtrx = glm::translate(modelMtrx, glm::vec3(0.f));
-		modelMtrx = glm::scale(modelMtrx, glm::vec3(1.f));
-		glm::mat4 normalMtrx = glm::transpose(glm::inverse(normalMtrx));
+		glm::mat4 modelMtrx(1.f);
 		shader.setMat4("model", modelMtrx);
-		shader.setMat4("normalModel", modelMtrx);
 
-		// Lighting
-		shader.setVec3("dirLight.direction", glm::vec3(-.2f, -1.f, -.3f));
-		shader.setVec3("dirLight.ambient", glm::vec3(.0f));
-		shader.setVec3("dirLight.diffuse", glm::vec3(.4f));
-		shader.setVec3("dirLight.specular", glm::vec3(.5f));
+		glm::mat3 normalMtrx = glm::transpose(glm::inverse(glm::mat3(modelMtrx)));
+		shader.setMat3("normalModel", normalMtrx);
+
+		// Directional lighting
+		// TODO: create a "dirLight" data structure to assign uniforms unanimously
+		shader.setVec3("dirLight.direction", glm::vec3(2.f, -2.f, -1.f));
+		shader.setVec3("dirLight.ambient", glm::vec3(.2f));
+		shader.setVec3("dirLight.diffuse", glm::vec3(1.f));
+		shader.setVec3("dirLight.specular", glm::vec3(1.f));
+		shader.setFloat("material.shininess", 16);
+
+		// Point lighting
 
 		// Draw model
 		model.draw(shader);
