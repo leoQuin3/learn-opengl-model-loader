@@ -5,10 +5,12 @@ add_executable(model_loader_main
 	"model.cpp"
 	"stb_image.cpp"
 	"camera.cpp"
+	"lighting.cpp"
 	"mesh.h"
 	"model.h"
 	"stb_image.h"
 	"camera.h"
+	"lighting.h"
 )
 
 add_compile_definitions(PROJECT_ROOT_DIR="${CMAKE_SOURCE_DIR}")

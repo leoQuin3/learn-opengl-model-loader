@@ -146,7 +146,7 @@ unsigned int Model::TextureFromFile(const char* path, const std::string& directo
 	}
 	else
 	{
-		std::cout << "Texture failed to load at path: " << path << std::endl;
+		std::cout << "ERROR::STBI_IMAGE::Texture failed to load at path: " << path << std::endl;
 		stbi_image_free(data);
 	}
 

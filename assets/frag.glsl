@@ -13,6 +13,7 @@ struct Material
     sampler2D texture_specular1;
     sampler2D texture_specular2;
     sampler2D texture_specular3;
+    sampler2D texture_specular4;
     float shininess;
 };
 
@@ -55,7 +56,7 @@ struct SpotLight
 uniform vec3 viewPos;
 uniform sampler2D textureSrc;
 uniform Material material;
-uniform DirLight dirLight;  // TODO #1: Create struct in main code that fills in this uniform
+uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
 
@@ -68,8 +69,7 @@ vec3 CalcPointLight(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewD
 vec3 CalcSpotLight(SpotLight spotLight, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 // TODO:
-//      1. Create a struct/class that represents Dirlight by assigning components of 'dirLight' uniform from main code!
-//
+//      3. Fix Point lighting
 //      2. maybe use arrays instead of hardcoding N number of texture_diffuseN's and texture_specularN's, and iterate through each to add onto fragment's color.
 
 void main()

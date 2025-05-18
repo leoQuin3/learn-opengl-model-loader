@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "stb_image.h"
 #include "model.h"
+#include "lighting.h"
 
 #ifdef PROJECT_ROOT_DIR
 
@@ -13,7 +14,7 @@ const unsigned int SCREEN_WIDTH = 1080;
 const unsigned int SCREEN_HEIGHT = 1080;
 const std::string VERTEX_SHADER_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/vert.glsl";
 const std::string FRAGMENT_SHADER_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/frag.glsl";
-const std::string MODEL_ASSET_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/backpack.obj";
+const std::string MODEL_ASSET_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/brick_cylinder.obj";
 
 // Delta time
 float deltaTime = 0.f;
@@ -34,7 +35,7 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
 
 // TODO:
-//	- Edit fragment shader to allow multiple number of texture maps (diffuse and specular)
+//	- Fix point lighting in frag.glsl
 //	- Move onto 'Advanced OpenGL' > 'Depth Testing'
 
 int main()
@@ -76,9 +77,10 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// Create shader program, camera, and model
+	// Shader program and other entities
 	Shader shader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_PATH.c_str());
 	Model model(MODEL_ASSET_PATH.c_str());
+	DirLight dirLight(glm::vec3(2.f, -2.f, -1.f), glm::vec3(.2f), glm::vec3(1.f), glm::vec3(1.f), 16);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -106,19 +108,11 @@ int main()
 		// Model transformations
 		glm::mat4 modelMtrx(1.f);
 		shader.setMat4("model", modelMtrx);
-
 		glm::mat3 normalMtrx = glm::transpose(glm::inverse(glm::mat3(modelMtrx)));
 		shader.setMat3("normalModel", normalMtrx);
 
-		// Directional lighting
-		// TODO: create a "dirLight" data structure to assign uniforms unanimously
-		shader.setVec3("dirLight.direction", glm::vec3(2.f, -2.f, -1.f));
-		shader.setVec3("dirLight.ambient", glm::vec3(.2f));
-		shader.setVec3("dirLight.diffuse", glm::vec3(1.f));
-		shader.setVec3("dirLight.specular", glm::vec3(1.f));
-		shader.setFloat("material.shininess", 16);
-
-		// Point lighting
+		// Lighting
+		dirLight.draw(shader);
 
 		// Draw model
 		model.draw(shader);
@@ -197,7 +191,7 @@ void cursorCallback(GLFWwindow* window, double xPosIn, double yPosIn)
 
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-	camera.fov += yOffset * 2.0;
+	camera.processMouseScroll(yOffset);
 }
 
 #endif
