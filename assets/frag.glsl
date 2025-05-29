@@ -1,5 +1,8 @@
 #version 330 core
 
+#define NR_POINT_LIGHTS 10
+#define RENDER_FULLBRIGHT 0
+
 in vec3 FragPos;
 in vec3 FragNorm;
 in vec2 TextCoords;
@@ -28,37 +31,35 @@ struct DirLight
 struct PointLight
 {
     vec3 position;
-    float constant;
-    float linear;
-    float quadratic;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 struct SpotLight
 {
     vec3 position;
     vec3 direction;
-    float cutOff;
-    float outerCutOff;
-    float constant;
-    float linear;
-    float quadratic;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float constant;
+    float linear;
+    float quadratic;
+    float cutOff;
+    float outerCutOff;
 };
 
-#define NR_POINT_LIGHTS 4
-#define RENDER_FULLBRIGHT 0
-
-uniform vec3 viewPos;
-uniform sampler2D textureSrc;
 uniform Material material;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
+
+uniform vec3 viewPos;
+uniform sampler2D textureSrc;
 
 out vec4 FragColor;
 
@@ -82,12 +83,13 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
 
     // Directional light
-    vec3 result = CalcDirLight(dirLight, normal, viewDir);
+    //vec3 result = CalcDirLight(dirLight, normal, viewDir);
+    vec3 result = GetDiffuseTexel() * 0.1;
     
     // Point lights
     // FIXME: Model goes completely dark after adding to result. Test this function.
-    //for (int i = 0; i < NR_POINT_LIGHTS; i++)
-    //    result += CalcPointLight(pointLights[i], normal, FragPos, viewDir);
+    for (int i = 0; i < NR_POINT_LIGHTS; i++)
+        result += CalcPointLight(pointLights[i], normal, FragPos, viewDir);
     
     //// Spot light
     //result += CalcSpotLight(spotLight, normal, FragPos, viewDir);
@@ -125,9 +127,6 @@ vec3 CalcDirLight(DirLight dirLight, vec3 normal, vec3 viewDir)
 }
 
 // Point lighting
-//
-//      - FIXME: Model goes completely dark after adding to result. Test this function.
-//
 vec3 CalcPointLight(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 lightDir = normalize(pointLight.position - fragPos);

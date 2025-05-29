@@ -8,13 +8,14 @@
 #include "lighting.h"
 
 #ifdef PROJECT_ROOT_DIR
+#define NR_POINT_LIGHTS 10
 
 // Constants
 const unsigned int SCREEN_WIDTH = 1080;
 const unsigned int SCREEN_HEIGHT = 1080;
 const std::string VERTEX_SHADER_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/vert.glsl";
 const std::string FRAGMENT_SHADER_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/frag.glsl";
-const std::string MODEL_ASSET_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/brick_cylinder.obj";
+const std::string MODEL_ASSET_PATH = std::string(PROJECT_ROOT_DIR) + "/assets/backpack.obj";
 
 // Delta time
 float deltaTime = 0.f;
@@ -35,8 +36,7 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
 
 // TODO:
-//	- Fix point lighting in frag.glsl
-//	- Move onto 'Advanced OpenGL' > 'Depth Testing'
+//		- Move onto 'Advanced OpenGL' > 'Depth Testing'
 
 int main()
 {
@@ -77,10 +77,36 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// Shader program and other entities
+	// Shader program
 	Shader shader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_PATH.c_str());
+
+	// 3D model
 	Model model(MODEL_ASSET_PATH.c_str());
+
+	// Lighting
 	DirLight dirLight(glm::vec3(2.f, -2.f, -1.f), glm::vec3(.2f), glm::vec3(1.f), glm::vec3(1.f), 16);
+	std::vector<PointLight> pointLights(NR_POINT_LIGHTS);
+	srand(time(0));
+	for (unsigned int i = 0; i < NR_POINT_LIGHTS; i++)
+	{
+		// Construct point light
+		float randXPos = (rand() % 21 - 10.0) + .0f;
+		float randYPos = (rand() % 21 - 10.0) + .0f;
+		float randZPos = (rand() % 21 - 10.0) + .0f;
+		pointLights[i] = PointLight(glm::vec3(randXPos, randYPos, randZPos), 0.05f, 1.f, 1.f, 16);
+
+		// Assign ambient
+		pointLights[i].ambient = glm::vec3(0.05f);
+		
+		// Diffuse
+		float randR = rand() % 10 + .05f;
+		float randG = rand() % 10 + .05f;
+		float randB = rand() % 10 + .05f;
+		pointLights[i].diffuse = glm::vec3(randR, randG, randB);
+
+		// Specular
+		pointLights[i].specular = glm::vec3((rand() % 10 + 1) * 0.1f);
+	}
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -111,8 +137,21 @@ int main()
 		glm::mat3 normalMtrx = glm::transpose(glm::inverse(glm::mat3(modelMtrx)));
 		shader.setMat3("normalModel", normalMtrx);
 
-		// Lighting
-		dirLight.draw(shader);
+		// Directional and point lighting
+		dirLight.use(shader);
+
+		for (unsigned int i = 0; i < NR_POINT_LIGHTS; i++)
+		{
+			shader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLights[i].position);
+			shader.setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
+			shader.setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
+			shader.setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
+
+			// NOTE: Keep these three the same for now
+			shader.setFloat("pointLights[" + std::to_string(i) + "].constant", 1.f);	
+			shader.setFloat("pointLights[" + std::to_string(i) + "].linear", .09f);
+			shader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", .032f);
+		}
 
 		// Draw model
 		model.draw(shader);
